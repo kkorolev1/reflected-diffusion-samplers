@@ -1,2 +1,2 @@
-# reflected-diffusion-samplers
-Repository for "Numerical Integration on Bounded Domains via Learned Reflected Diffusions"
+# Numerical Integration on Bounded Domains via Learned Reflected Diffusions
+The source code is coming soon.
