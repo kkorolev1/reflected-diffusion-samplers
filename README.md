@@ -11,7 +11,7 @@ Kirill Korolev, Artur Goldman, Timofei Gritsaev, Tigran Ramazyan, Nikita Morozov
 We study high-dimensional integration on bounded convex domains. Given a non-negative integrand $`r`$, the goal is to estimate
 
 $$
-Z = \int_{\mathcal{D}} r(x)\,\mathrm{d}x,
+Z = \int_{\mathcal{D}} r(x) \mathrm{d}x,
 \qquad \mathcal{D} \subset \mathbb{R}^d.
 $$
 
