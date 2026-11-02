@@ -1,0 +1,27 @@
+# @package _global_
+defaults:
+  - target: genz_continuous
+  - algorithm: rds
+  - setup
+  - _self_
+
+seed: 0  # Random Seed
+n_runs: 3
+fix_eval_budget: False
+log_dir: logs/${algorithm.name}_${target.name}_${target.dim}D_${seed}_${now:%Y-%m-%d}/${now:%H-%M-%S}
+#use_jit: False  # Disable jit for better debugging
+use_jit: True
+eval_samples: 2048  # Number of samples used for evaluation
+n_evals: 100  # Number of evaluations during training
+moving_average:  # Moving average over subsequent evaluations
+  use_ma: True
+  window_size: 5
+discrepancies: [sd]  # IPMs: Sinkhorn (Entropy-regularized Wasserstein Distance) and Maximum Mean Discrepancy
+compute_emc: False  # Entropic Mode Coverage
+compute_forward_metrics: True
+compute_sd: False
+use_logger: True  # Enable configured JSON, Comet, and/or in-memory logging
+verbose: True  # Intermediate results are printed if True
+visualize_samples: True  # Samples are visualized if target density permitts
+save_samples: False  # Save samples with highest ELBO
+save_model: False  # Checkpointing is currently not implemented

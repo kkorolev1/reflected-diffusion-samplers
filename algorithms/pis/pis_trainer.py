@@ -1,0 +1,101 @@
+"""
+Code for Path integral sampler: a stochastic control approach for sampling.
+For further details see: https://arxiv.org/abs/2111.15141.
+Code based on https://github.com/franciscovargas/denoising_diffusion_samplers
+"""
+
+from functools import partial
+from time import time
+
+import distrax
+import jax
+import jax.numpy as jnp
+import math
+
+from algorithms.common.diffusion_related.init_model import init_model
+from algorithms.common.eval_methods.stochastic_oc_methods import (
+    get_eval_fn,
+    compute_estimates_from_weights,
+)
+from algorithms.pis.pis_rnd import neg_elbo, rnd
+from eval.utils import extract_last_entry, update_train_estimate
+from utils.logger import log
+from utils.print_utils import print_results
+
+
+def pis_trainer(cfg, target):
+    key_gen = jax.random.PRNGKey(cfg.seed)
+    dim = target.dim
+    alg_cfg = cfg.algorithm
+    batch_size = alg_cfg.batch_size
+
+    print(f"True log_Z: {target.log_Z}")
+    print(f"True Z: {target.Z}")
+    print(f"Needs correction: {target.needs_correction}, corrector: {target.corrector}")
+
+    # Define reference and target density
+    normal_log_prob = lambda x, sigma: distrax.MultivariateNormalDiag(
+        jnp.zeros(dim), jnp.ones(dim) * sigma
+    ).log_prob(x)
+    aux_tuple = (dim, normal_log_prob)
+
+    # Initialize the model
+    key, key_gen = jax.random.split(key_gen)
+    model_state = init_model(key, dim, alg_cfg)
+
+    loss = jax.jit(
+        jax.grad(neg_elbo, 2, has_aux=True), static_argnums=(3, 4, 5, 6, 7, 8)
+    )
+    rnd_short = partial(
+        rnd,
+        initial_density_tuple=aux_tuple,
+        target=target,
+        num_steps=cfg.algorithm.num_steps,
+        noise_schedule=cfg.algorithm.noise_schedule,
+        use_lp=alg_cfg.model.use_lp,
+        stop_grad=False,
+    )
+
+    eval_fn, logger = get_eval_fn(rnd_short, target, cfg)
+
+    eval_freq = max(alg_cfg.iters // cfg.n_evals, 1)
+    timer = 0
+    running_metrics = {"Z_train/value": None}
+
+    for step in range(alg_cfg.iters):
+        key, key_gen = jax.random.split(key_gen)
+        iter_time = time()
+        grads, (losses, log_is_weights) = loss(
+            key,
+            model_state,
+            model_state.params,
+            alg_cfg.batch_size,
+            aux_tuple,
+            target,
+            alg_cfg.num_steps,
+            alg_cfg.noise_schedule,
+            alg_cfg.model.use_lp,
+        )
+        timer += time() - iter_time
+
+        model_state = model_state.apply_gradients(grads=grads)
+        _, Z = compute_estimates_from_weights(log_is_weights, target)
+        running_metrics["Z_train/value"] = update_train_estimate(
+            Z, running_metrics["Z_train/value"], batch_size, step * batch_size
+        )
+
+        if (step % eval_freq == 0) or (step == alg_cfg.iters - 1):
+            log({"loss": jnp.mean(losses)}, step=step)
+            key, key_gen = jax.random.split(key_gen)
+            logger["stats/step"].append(step)
+            logger["stats/wallclock"].append(timer)
+            logger["stats/nfe"].append((step + 1) * alg_cfg.batch_size)
+
+            logger.update(eval_fn(model_state, key, step))
+            print_results(step, logger, cfg)
+
+            if cfg.use_logger:
+                log(extract_last_entry(logger), step=step)
+                # fmt: off
+                log({"Z_train/value": running_metrics["Z_train/value"], 
+                    "Z_train/delta": jnp.abs(running_metrics["Z_train/value"] - target.Z)}, step=step)

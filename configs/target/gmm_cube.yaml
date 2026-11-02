@@ -1,0 +1,27 @@
+name: gmm_cube
+dim: 10
+
+fn:
+  _target_: targets.gmm_cube.GMMCube
+  dim: ${target.dim}
+
+# Experiment-specific algorithm parameters
+# !!! Default Parameters; Currently not tuned for this experiment !!!
+# ----------------------------------------
+
+pis:
+  max_diffusion: 1.
+  step_size: 1e-3
+
+rds:
+  step_size: 1e-3
+  min_diffusion: 0.001
+  max_diffusion: 1.0
+
+all: # Parameters that are shared between all algorithms
+  batch_size: 512
+  iters: 4000
+  milestones: [2000]
+  num_steps: 64
+  use_lp: True
+  num_hid: 256

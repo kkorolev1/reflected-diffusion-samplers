@@ -1,0 +1,31 @@
+# Logger configuration
+logger:
+  # Enable/disable logging backends
+  use_json: True  # Persist metrics and figures without credentials or network access
+  use_comet: True  # Comet also retains the same local JSON logs
+  use_local: False
+  
+  # Wandb configuration
+  wandb:
+    entity: # Your identity here
+    project: sampling_bench
+    resume: allow
+    mode: run
+    name:
+    tags:
+    id:
+  
+  # Comet.ml configuration
+  comet:
+    workspace: YOUR_WORKSPACE
+    project_name: YOUR_PROJECT_NAME
+    experiment_name:
+    tags:
+
+# Hydra
+hydra:
+  run:
+    dir: ${log_dir}
+  sweep:
+    dir: ${hydra.run.dir}
+    subdir: ${hydra.job.override_dirname}

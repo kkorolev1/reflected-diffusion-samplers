@@ -1,0 +1,26 @@
+name: nice_digits
+dim: 196 # 196 or 784
+has_entropy: True
+
+fn:
+  _target_: targets.nice.NiceTarget
+  dataset: mnist
+  dim: ${target.dim}
+  log_Z: 0.
+  can_sample: True
+  sample_bounds: None
+
+# Experiment-specific algorithm parameters
+# ----------------------------------------
+
+pis: # Path Integral Sampler
+  max_diffusion: 5.
+  step_size: 5e-4
+
+all: # Parameters that are shared between all algorithms
+  batch_size: 2048
+  iters: 40000
+  milestones: [20000, 30000]
+  num_steps: 128
+  use_lp: True
+  num_hid: 256

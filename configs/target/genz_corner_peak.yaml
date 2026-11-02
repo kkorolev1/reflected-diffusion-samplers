@@ -1,0 +1,28 @@
+name: genz_corner_peak
+dim: 2
+
+fn:
+  _target_: targets.genz.GenzCornerPeak
+  dim: ${target.dim}
+  a: 5.0
+
+# Experiment-specific algorithm parameters
+# !!! Default Parameters; Currently not tuned for this experiment !!!
+# ----------------------------------------
+
+pis:
+  max_diffusion: 1.
+  step_size: 1e-3
+
+rds:
+  step_size: 1e-3
+  min_diffusion: 0.001
+  max_diffusion: 1.0
+
+all: # Parameters that are shared between all algorithms
+  batch_size: 512
+  iters: 4000
+  milestones: [5000]
+  num_steps: 64
+  use_lp: True
+  num_hid: 256

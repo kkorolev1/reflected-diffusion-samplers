@@ -1,0 +1,32 @@
+name: asian_option_hard
+dim: 120
+corrector: 1e-10
+
+fn:
+  _target_: targets.asian_option.ArithmeticAsianOption
+  dim: ${target.dim}
+  corrector: ${target.corrector}
+  start_period: 1
+  strike: 90
+  Z_gt: 11.207
+
+# Experiment-specific algorithm parameters
+# !!! Default Parameters; Currently not tuned for this experiment !!!
+# ----------------------------------------
+
+pis:
+  max_diffusion: 1.
+  step_size: 1e-3
+
+rds:
+  step_size: 1e-3
+  min_diffusion: 0.001
+  max_diffusion: 1.0
+
+all: # Parameters that are shared between all algorithms
+  batch_size: 512
+  iters: 4000
+  milestones: [2000]
+  num_steps: 64
+  use_lp: False
+  num_hid: 256

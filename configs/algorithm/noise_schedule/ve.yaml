@@ -1,0 +1,4 @@
+_target_: algorithms.common.diffusion_related.noise_schedule.get_ve_noise_schedule
+total_steps: ${algorithm.num_steps}
+sigma_min: ${algorithm.min_diffusion}
+sigma_max: ${algorithm.max_diffusion}

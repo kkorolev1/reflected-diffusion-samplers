@@ -1,0 +1,33 @@
+name: stripe_cube
+dim: 2
+boundary_prob: 1.0
+floor_prob: 1e-10
+vanish_power: 8.0
+
+fn:
+  _target_: targets.stripe_cube.StripeCube
+  dim: ${target.dim}
+  boundary_prob: ${target.boundary_prob}
+  floor_prob: ${target.floor_prob}
+  vanish_power: ${target.vanish_power}
+
+# Experiment-specific algorithm parameters
+# !!! Default Parameters; Currently not tuned for this experiment !!!
+# ----------------------------------------
+
+pis:
+  max_diffusion: 1.
+  step_size: 1e-3
+
+rds:
+  step_size: 1e-3
+  min_diffusion: 0.001
+  max_diffusion: 1.0
+
+all: # Parameters that are shared between all algorithms
+  batch_size: 512
+  iters: 4000
+  milestones: [2000]
+  num_steps: 64
+  use_lp: True
+  num_hid: 256

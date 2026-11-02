@@ -1,0 +1,40 @@
+name: ffbq
+
+iters: 21
+n_train: 5000
+n_eval: 5000
+use_eval_split: true
+
+# Supported: gp, rff, lrgp, lrrbf, svgp
+model: lrgp
+
+# Supported: rbf, rff
+kernel: rbf
+
+num_features: 256
+
+diag: 1e-3
+epochs: 600
+lr: 1e-3
+init_ls: true
+
+# Supported: gaussian, mc, qmc, fft, svgp, sparse_mc, sparse_qmc, sparse_fft
+operator: sparse_qmc
+
+bq_diag: 1e-4
+num_conv_samples: 100000
+sr: 64
+
+operator_kwargs: {}
+
+measure: uniform
+measure_mean: null
+measure_scale: null
+
+gp: {}
+rff: {}
+lrrbf: {}
+svgp: {}
+
+lrgp:
+  dropout: 0.2

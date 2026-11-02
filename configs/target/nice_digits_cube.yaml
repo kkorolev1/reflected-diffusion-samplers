@@ -1,0 +1,26 @@
+name: nice_digits_cube
+dim: 196 # 196 or 784
+
+fn:
+  _target_: targets.nice_cube.NiceCube
+  dataset: mnist
+  dim: ${target.dim}
+
+# Experiment-specific algorithm parameters
+# ----------------------------------------
+pis:
+  max_diffusion: 5.
+  step_size: 5e-4
+
+rds:
+  step_size: 5e-4
+  min_diffusion: 0.001
+  max_diffusion: 0.5
+
+all: # Parameters that are shared between all algorithms
+  batch_size: 2048
+  iters: 40000
+  milestones: [20000, 30000]
+  num_steps: 128
+  use_lp: True
+  num_hid: 256

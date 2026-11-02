@@ -1,0 +1,22 @@
+name: zunis
+
+batch_size: ${target.all.batch_size}
+iters: ${target.all.iters}
+
+# Reuse every survey batch for several optimizer updates.
+# These extra updates do not make new target calls.
+reuse_epochs: 1
+survey_strategy: forward_flat_init  # flat | forward | forward_flat_init
+
+# Published ZüNIS objectives.
+loss: dkl  # dkl | variance
+
+# Bounded piecewise-quadratic coupling flow.
+num_layers: 8
+num_bins: 10
+hidden_sizes: [256, 256]
+min_derivative: 1.0e-3
+
+# Optimizer.
+lr: 1.0e-3
+max_grad_norm: 1.0
