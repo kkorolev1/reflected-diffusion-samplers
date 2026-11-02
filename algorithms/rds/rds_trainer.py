@@ -43,8 +43,6 @@ def load_trained_model(cfg, target, ckpt_path):
     model_state = model_state.replace(params=params)
 
     print(f"Loaded checkpoint from iter {payload.get('iter', 'unknown')}")
-    # cfg_loaded = OmegaConf.create(payload["config"])
-    print(f"Config succesfully loaded from checkpoint")
 
     return model_state
 
@@ -76,8 +74,6 @@ def rds_trainer(cfg, target):
     # Initialize the model
     key, key_gen = jax.random.split(key_gen)
     model_state = init_model_rds(key, dim, alg_cfg)
-
-    model_state = load_trained_model(cfg, target, "model_params_39999.pkl")
 
     if cfg.algorithm.loss == "kl_reparam":
         loss_fn = kl_loss_reparam_fn
@@ -117,10 +113,8 @@ def rds_trainer(cfg, target):
     eval_freq = max(alg_cfg.iters // cfg.n_evals, 1)
     timer = 0
     running_metrics = {"Z_train/value": None}
-    logger.update(eval_fn(model_state, key, iter_step=0))
-    log(extract_last_entry(logger), step=0)
+    
     for step in range(alg_cfg.iters):
-        break
         iter_time = time()
         key, key_gen = jax.random.split(key_gen)
         grads, (losses, log_is_weights) = loss_fwd_grad_fn(
